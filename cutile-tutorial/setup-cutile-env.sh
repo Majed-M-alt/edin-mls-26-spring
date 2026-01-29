@@ -22,7 +22,13 @@ echo
 # =========================
 # Check / Install conda
 # =========================
-if ! command -v conda >/dev/null 2>&1; then
+if command -v conda >/dev/null 2>&1; then
+	echo ">>> conda found: $(conda --version)"
+	eval "$(conda shell.bash hook)"
+elif [ -x /opt/conda/bin/conda ]; then
+	echo ">>> conda found at /opt/conda/bin/conda"
+	eval "$(/opt/conda/bin/conda shell.bash hook)"
+else
 	echo ">>> conda not found. Installing Miniconda..."
 
 	MINICONDA_INSTALLER="/tmp/miniconda_installer.sh"
@@ -36,10 +42,6 @@ if ! command -v conda >/dev/null 2>&1; then
 	# Initialize conda for future shells
 	conda init bash
 	echo ">>> Miniconda installed at ${MINICONDA_INSTALL_DIR}"
-else
-	echo ">>> conda found: $(conda --version)"
-	# Ensure conda commands are available in this script
-	eval "$(conda shell.bash hook)"
 fi
 
 # =========================
@@ -56,7 +58,7 @@ if conda env list | grep -q "^${ENV_NAME} "; then
 	echo ">>> Reusing existing conda environment: ${ENV_NAME}"
 else
 	echo ">>> Creating conda environment: ${ENV_NAME} (Python ${PYTHON_VERSION})"
-	conda create -y -n "${ENV_NAME}" python="${PYTHON_VERSION}"
+	conda create -y -n "${ENV_NAME}" python="${PYTHON_VERSION}" --override-channels -c conda-forge
 fi
 
 conda activate "${ENV_NAME}"
