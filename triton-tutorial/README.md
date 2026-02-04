@@ -10,13 +10,15 @@ If you are using the project environment:
 
 ```bash
 # Run from project root
-bash utils/setup-env.sh
+bash utils/setup-triton
 ```
+
+This installs `torch`, `numpy`, and `triton` into the shared `mls` conda environment.
 
 Or install Triton + PyTorch directly:
 
 ```bash
-pip install triton torch
+pip install torch numpy triton
 ```
 
 ### 2. Activate Environment
