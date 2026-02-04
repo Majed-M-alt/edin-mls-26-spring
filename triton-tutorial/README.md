@@ -10,7 +10,7 @@ If you are using the project environment:
 
 ```bash
 # Run from project root
-bash utils/setup-triton
+bash utils/setup-triton.sh
 ```
 
 This installs `torch`, `numpy`, and `triton` into the shared `mls` conda environment.

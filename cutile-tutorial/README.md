@@ -8,7 +8,7 @@ NVIDIA cuTile Python GPU programming tutorials.
 
 ```bash
 # Run from project root
-bash utils/setup-cutile
+bash utils/setup-cutile.sh
 ```
 
 This creates a conda environment named `mls` with:
