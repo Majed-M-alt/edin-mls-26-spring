@@ -4,7 +4,12 @@ This assignment helps you understand GPU kernel optimization by implementing a s
 
 ## Overview
 
-GLM-ASR is a speech-to-text model that converts audio into text. Your task is to complete the missing implementations in the CuTile template and optimize the performance.
+GLM-ASR is a speech-to-text model that converts audio into text. The Triton version is not released yet; the current HW1 uses the CuTile template and focuses on performance optimization.
+
+## Frameworks
+
+- **Triton**: Not released yet (will be listed first when available)
+- **cuTile**: Current HW1 implementation
 
 ## Directory Structure
 

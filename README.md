@@ -4,13 +4,14 @@ Welcome to the Machine Learning Systems course at the University of Edinburgh (S
 
 ## Quick Start
 
+### Triton Track
+
 ```bash
 # 1. Clone and enter the repository
 git clone <repo-url> && cd edin-mls-26-spring
 
-# 2. Set up the conda environment
-source utils/setup-cutile.sh  # cuTile + hw1
-# source utils/setup-triton.sh  # Triton-only (torch, numpy, triton)
+# 2. Set up the conda environment (Triton-only)
+source utils/setup-triton.sh
 # If `conda` isn't on PATH in a new shell:
 # <conda> is your conda install prefix (e.g. ~/miniconda3 or /opt/conda).
 # You can find it with: conda info --base
@@ -18,8 +19,28 @@ source utils/setup-cutile.sh  # cuTile + hw1
 # conda activate mls
 
 # 3. Verify your environment
-python cutile-tutorial/0-environment/check.py   # For cuTile
-python triton-tutorial/0-environment/check.py   # For Triton
+python triton-tutorial/0-environment/check.py
+
+# 4. Start with Lesson 1
+cd triton-tutorial/1-vectoradd && python vectoradd.py
+```
+
+### cuTile Track
+
+```bash
+# 1. Clone and enter the repository
+git clone <repo-url> && cd edin-mls-26-spring
+
+# 2. Set up the conda environment (cuTile + hw1)
+source utils/setup-cutile.sh
+# If `conda` isn't on PATH in a new shell:
+# <conda> is your conda install prefix (e.g. ~/miniconda3 or /opt/conda).
+# You can find it with: conda info --base
+# source <conda>/bin/activate
+# conda activate mls
+
+# 3. Verify your environment
+python cutile-tutorial/0-environment/check.py
 
 # 4. Start with Lesson 1
 cd cutile-tutorial/1-vectoradd && python vectoradd.py
@@ -29,6 +50,9 @@ cd cutile-tutorial/1-vectoradd && python vectoradd.py
 
 ```
 edin-mls-26-spring/
+├── triton-tutorial/          # OpenAI Triton tutorials (parallel to cuTile)
+│   └── (same lesson structure as cutile-tutorial)
+│
 ├── cutile-tutorial/          # NVIDIA cuTile GPU programming tutorials
 │   ├── 0-environment/        # Environment verification
 │   ├── 1-vectoradd/          # Lesson 1: Hello World - Vector Addition
@@ -40,22 +64,17 @@ edin-mls-26-spring/
 │   ├── 7-attention/          # Lesson 7: Attention mechanism kernels
 │   └── *.pdf                 # Course slides
 │
-├── triton-tutorial/          # OpenAI Triton tutorials (parallel to cuTile)
-│   └── (same lesson structure as cutile-tutorial)
-│
 ├── hw1-asr/                  # Homework 1: Automatic Speech Recognition
 │   ├── glm_asr_cutile_template/  # YOUR WORK GOES HERE (fill in TODOs)
-│   ├── glm_asr_cutile_v1/        # Baseline implementation (~3200ms)
-│   ├── glm_asr_cutile_example/   # Reference solution
+│   ├── glm_asr_cutile_example/   # Baseline reference (~3200ms)
 │   ├── glm_asr_scratch/          # PyTorch CPU reference
 │   ├── benchmark.sh              # Performance benchmarking
 │   ├── demo.py                   # Interactive Streamlit demo
 │   └── test_audio.wav            # Test audio file
 │
-├── utils/                    # Environment and compatibility tools
-│   ├── setup-cutile.sh       # cuTile + hw1 environment setup
+├── utils/                    # Environment tools
 │   ├── setup-triton.sh       # Triton-only environment setup
-│   └── hack.sh               # Compatibility layer for non-Blackwell GPUs
+│   └── setup-cutile.sh       # cuTile + hw1 environment setup
 │
 └── requirements-*.lock       # Platform-specific dependency snapshots
 ```
@@ -66,8 +85,8 @@ Follow this recommended progression:
 
 | Phase | What to Do | Goal |
 |-------|------------|------|
-| **1. Setup** | Run `source utils/setup-cutile.sh` (or `source utils/setup-triton.sh`) | Get your environment working |
-| **2. Basics** | Complete Lessons 1-3 in `cutile-tutorial/` | Understand GPU execution model |
+| **1. Setup** | Run `source utils/setup-triton.sh` (or `source utils/setup-cutile.sh`) | Get your environment working |
+| **2. Basics** | Complete Lessons 1-3 in `triton-tutorial/` | Understand GPU execution model |
 | **3. Optimization** | Complete Lessons 4-6 | Learn memory patterns and autotuning |
 | **4. Advanced** | Complete Lesson 7 (Attention) | Master complex kernel patterns |
 | **5. Application** | Work on `hw1-asr/` | Apply skills to real ML task |
@@ -78,34 +97,31 @@ This course covers two GPU programming frameworks with identical lesson structur
 
 | Framework | Directory | Best For |
 |-----------|-----------|----------|
-| **cuTile** | `cutile-tutorial/` | NVIDIA-specific optimization |
 | **Triton** | `triton-tutorial/` | Cross-platform, Python-native |
+| **cuTile** | `cutile-tutorial/` | NVIDIA-specific optimization |
 
-Start with **cuTile** for the main course content. Use **Triton** if you want to explore an alternative approach or need better cross-GPU portability.
+Start with **Triton** for broad GPU compatibility. Use **cuTile** if you want NVIDIA-specific optimization on supported GPUs.
 
 ## GPU Compatibility
 
 This repository includes both cuTile and Triton tutorials, and their GPU support differs.
 
+### Triton
+
+Triton relies on the underlying PyTorch backend. A recent NVIDIA GPU (sm70+ recommended) is typically required for CUDA builds.
+
 ### cuTile
 
-The cuTile tutorials are optimized for NVIDIA Blackwell GPUs but support other architectures via `hack.sh`:
+The cuTile tutorials are optimized for NVIDIA Blackwell GPUs. Other architectures are not supported in this repo.
 
 | GPU Architecture | Support | Notes |
 |------------------|---------|-------|
 | Blackwell (sm_120) | Native | RTX PRO 6000, full cuTile support |
-| Hopper (sm_90) | Via hack.sh | H100, requires compatibility layer |
-| Ada (sm_89) | Via hack.sh | RTX 4090, requires compatibility layer |
-| Ampere (sm_80) | Via hack.sh | A100/RTX 30xx, requires compatibility layer |
+| Hopper (sm_90) | Not supported | H100 |
+| Ada (sm_89) | Not supported | RTX 4090 |
+| Ampere (sm_80) | Not supported | A100/RTX 30xx |
 
-If you want to try cuTile on non-Blackwell GPUs, run the compatibility script before executing cuTile code:
-```bash
-source utils/hack.sh
-```
-
-### Triton
-
-Triton relies on the underlying PyTorch backend. A recent NVIDIA GPU (sm70+ recommended) is typically required for CUDA builds.
+If you are on non-Blackwell GPUs, use Triton tutorials instead.
 
 ## Choosing the Right GPU Programming Tool
 
@@ -161,7 +177,7 @@ flowchart TD
 
 ## Homework 1: Automatic Speech Recognition
 
-As we discussed in [Tool Comparison](https://github.com/ed-aisys/edin-mls-26-spring#tool-comparison), CUDA can be quite complex and daunting for beginners, while CuPy may experience significant performance issues. We aimed to strike a balance between ease of programming and performance. Therefore, we offer two frameworks for HW1: the CuTile version and the Triton version.
+As we discussed in [Tool Comparison](https://github.com/ed-aisys/edin-mls-26-spring#tool-comparison), CUDA can be quite complex and daunting for beginners, while CuPy may experience significant performance issues. We aimed to strike a balance between ease of programming and performance. Therefore, we offer two frameworks for HW1: the Triton version and the CuTile version.
 
 > [!NOTE]
 > The Triton version of `hw1-asr` is not released yet and will be provided later.
@@ -171,8 +187,7 @@ The `hw1-asr/` directory contains a hands-on assignment implementing GPU-acceler
 ```
 hw1-asr/
 ├── glm_asr_cutile_template/  # Start here - fill in the TODOs
-├── glm_asr_cutile_v1/        # Baseline to beat (~3200ms)
-├── glm_asr_cutile_example/   # Reference (don't peek until you try!)
+├── glm_asr_cutile_example/   # Baseline (~3200ms)
 └── glm_asr_scratch/          # PyTorch CPU version for understanding
 ```
 
@@ -192,7 +207,7 @@ The `requirements-*.lock` files are platform-specific dependency snapshots:
 - `requirements-blackwell.lock` - NVIDIA Blackwell GPU (RTX PRO 6000, sm_120)
 - `requirements-hopper.lock` - NVIDIA Hopper GPU (if available)
 
-These are generated by `conda list --export` and vary across GPU architectures. Use `source utils/setup-cutile.sh` (or `source utils/setup-triton.sh`) for automatic configuration.
+These are generated by `conda list --export` and vary across GPU architectures. Use `source utils/setup-triton.sh` (or `source utils/setup-cutile.sh`) for automatic configuration.
 
 ## Resources
 
@@ -206,7 +221,7 @@ These are generated by `conda list --export` and vary across GPU architectures. 
 | Issue | Solution |
 |-------|----------|
 | Environment setup fails | Check conda ToS accepted: `conda tos accept` |
-| cuTile import errors | Run `source utils/hack.sh` for non-Blackwell GPUs |
+| cuTile import errors | cuTile is only supported on Blackwell GPUs in this repo |
 | CUDA out of memory | Reduce batch size or restart Python kernel |
 | Kernel compilation slow | First run compiles; subsequent runs are cached |
 

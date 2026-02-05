@@ -17,11 +17,11 @@ This creates a conda environment named `mls` with:
 - HuggingFace (transformers, datasets)
 - PyTorch, Streamlit, etc.
 
-### 2. Activate Environment and Configure hack.sh
+### 2. Activate Environment
 
 ```bash
 conda activate mls
-source utils/hack.sh  # Run from project root
+source utils/setup-cutile.sh  # Run from project root
 ```
 
 If `conda` isn't on PATH in a new shell (`<conda>` is the conda install prefix, e.g. `~/miniconda3` or `/opt/conda`):
@@ -43,11 +43,11 @@ python cutile-tutorial/1-vectoradd/vectoradd.py
 
 ### Non-Blackwell GPU (RTX 40/30 series, A100, H100, etc.)
 
-**Recommended**: Source hack.sh then run (supports both cutile and hw1-asr):
+**Recommended**: Run setup-cutile.sh then continue (supports both cutile and hw1-asr):
 
 ```bash
 # From project root
-source utils/hack.sh
+source utils/setup-cutile.sh
 
 # Run cuTile tutorials
 python cutile-tutorial/1-vectoradd/vectoradd.py
@@ -57,11 +57,10 @@ python cutile-tutorial/7-attention/attention.py
 python hw1-asr/benchmark_student.py glm_asr_scratch
 ```
 
-`hack.sh` automatically:
+`setup-cutile.sh` automatically:
 - Sets CUDA environment variables (CUDA_PATH, CUDA_HOME, LD_LIBRARY_PATH, CUPY_CUDA_PATH)
 - Sets CuPy compilation include paths (CFLAGS, CXXFLAGS)
-- Injects hack-hopper compatibility layer into PYTHONPATH
-- Translates cuTile API to CuPy RawKernel implementation
+- Creates/activates the conda environment
 
 ## Tutorial Directories
 
@@ -82,6 +81,6 @@ python hw1-asr/benchmark_student.py glm_asr_scratch
 |-----|-------------------|----------------|
 | RTX 5090/5080 | 12.x | Native support |
 | B100/B200/GB200 | 10.x | Native support |
-| RTX 4090/4080 | 8.9 | hack.sh compatibility layer |
-| RTX 3090/3080 | 8.6 | hack.sh compatibility layer |
-| A100/H100 | 8.0/9.0 | hack.sh compatibility layer |
+| RTX 4090/4080 | 8.9 | Not supported |
+| RTX 3090/3080 | 8.6 | Not supported |
+| A100/H100 | 8.0/9.0 | Not supported |
