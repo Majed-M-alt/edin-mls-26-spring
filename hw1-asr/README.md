@@ -266,18 +266,3 @@ If you encounter issues:
 3. Ask during office hours
 
 Good luck!
-
-
-
-| Kernel（功能） | Triton Example | Triton Template | cuTile Example | cuTile Template |
-  |---|---|---|---|---|
-  | attention_scores_kernel | Triton kernel ✅（小维度）+ Torch fallback | Triton kernel TODO ❌（小维度会走 TODO）+ Torch fallback | cuTile kernel ✅（小维度）+ CuPy fallback | cuTile kernel TODO ❌（小维度会走 TODO）+ CuPy fallback |
-  | softmax_inplace_kernel（attention 内） | Triton kernel ✅ + Torch fallback | Triton kernel TODO ❌ + Torch fallback | cuTile kernel ✅ + CuPy fallback | cuTile kernel TODO ❌ + CuPy fallback |
-  | attention_output_kernel | Triton kernel ✅ + Torch fallback | Triton kernel TODO ❌ + Torch fallback | cuTile kernel ✅ + CuPy fallback | cuTile kernel TODO ❌ + CuPy fallback |
-  | rmsnorm_kernel | Triton kernel ✅（符合 tile 条件）+ Torch fallback | Triton kernel TODO ❌ + Torch fallback | cuTile kernel ✅ | cuTile kernel TODO ❌ |
-  | layernorm_kernel | Triton kernel ✅ + Torch fallback | Triton kernel TODO ❌ + Torch fallback | cuTile kernel ✅ | cuTile kernel TODO ❌ |
-  | gelu_kernel | Triton kernel ✅ + Torch fallback | Triton kernel TODO ❌ + Torch fallback | cuTile kernel ✅ | cuTile kernel TODO ❌ |
-  | silu_kernel | Triton kernel ✅ + Torch fallback | Triton kernel TODO ❌ + Torch fallback | cuTile kernel ✅ | cuTile kernel TODO ❌ |
-  | linear_kernel_tf32 | Triton kernel ✅ + Torch fallback | Triton kernel TODO ❌ + Torch fallback | cuTile kernel ✅ | cuTile kernel TODO ❌ |
-  | softmax_kernel（通用） | Triton kernel ✅ + Torch fallback | Triton kernel TODO ❌ + Torch fallback | cuTile kernel ✅ | cuTile kernel TODO ❌ |
-  | compute_freqs_kernel（RoPE） | Triton kernel ✅ + Torch fallback | Triton kernel TODO ❌ + Torch fallback | cuTile kernel ✅ | cuTile kernel TODO ❌ |
