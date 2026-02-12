@@ -2,6 +2,8 @@
 
 This assignment helps you understand GPU kernel optimization by implementing a speech recognition model using Triton and NVIDIA cuTile.
 
+> **New here?** Read the **[Detailed Student Guide (GUIDE.md)](GUIDE.md)** for a step-by-step walkthrough, kernel patterns, and troubleshooting tips.
+
 ## Overview
 
 GLM-ASR is a speech-to-text model that converts audio into text. This HW1 includes Triton and cuTile tracks (example + template) and focuses on performance optimization. **You only need to choose one from this to complete**, which we recommand Triton for its compatability in a lot of hardwares.
@@ -96,10 +98,10 @@ source utils/setup-triton.sh
 # pip install transformers huggingface_hub streamlit soundfile scipy
 
 # cuTile track
-source utils/setup-cutile.sh
+source utils/setup-cutile-fix.sh
 ```
 
-`setup-cutile.sh` installs common ML tooling used by the demo:
+`setup-cutile-fix.sh` installs common ML tooling used by the demo:
 `transformers`, `huggingface_hub`, `streamlit`, `soundfile`, `scipy`.
 
 ### Triton Track
