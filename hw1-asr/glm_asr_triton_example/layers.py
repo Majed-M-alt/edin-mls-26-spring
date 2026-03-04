@@ -50,7 +50,7 @@ def rmsnorm_kernel(
     eps,
     BLOCK_SIZE: tl.constexpr,
 ):
-    """RMSNorm: x / RMS(x) * weight."""
+    """RMSNorm: x / RMS(x) * weight.TODO"""
     pid = tl.program_id(0)
     offs = tl.arange(0, BLOCK_SIZE)
     mask = offs < hidden_size
@@ -76,7 +76,7 @@ def layernorm_kernel(
     eps,
     BLOCK_SIZE: tl.constexpr,
 ):
-    """LayerNorm: (x - mean) / sqrt(var + eps) * weight + bias."""
+    """LayerNorm: (x - mean) / sqrt(var + eps) * weight + bias.TODO"""
     pid = tl.program_id(0)
     offs = tl.arange(0, BLOCK_SIZE)
     mask = offs < hidden_size
@@ -95,7 +95,7 @@ def layernorm_kernel(
 
 @triton.jit
 def gelu_kernel(x_ptr, y_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
-    """GELU using tanh approximation."""
+    """GELU using tanh approximation.TODO"""
     pid = tl.program_id(0)
     offs = pid * BLOCK_SIZE + tl.arange(0, BLOCK_SIZE)
     mask = offs < n_elements
@@ -110,7 +110,7 @@ def gelu_kernel(x_ptr, y_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
 
 @triton.jit
 def silu_kernel(x_ptr, y_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
-    """SiLU/Swish: x * sigmoid(x)."""
+    """SiLU/Swish: x * sigmoid(x).TODO"""
     pid = tl.program_id(0)
     offs = pid * BLOCK_SIZE + tl.arange(0, BLOCK_SIZE)
     mask = offs < n_elements
@@ -140,7 +140,7 @@ def linear_kernel_tf32(
 ):
     """
     Tensor core-style matmul: output = A @ B.
-    A: (M, K), B: (K, N), C: (M, N)
+    A: (M, K), B: (K, N), C: (M, N) TODO
     """
     pid_m = tl.program_id(0)
     pid_n = tl.program_id(1)
@@ -312,7 +312,7 @@ def embedding_kernel(
 
 @triton.jit
 def softmax_kernel(x_ptr, y_ptr, stride_x, stride_y, n_cols, BLOCK_SIZE: tl.constexpr):
-    """Numerically stable softmax over last dimension."""
+    """Numerically stable softmax over last dimension.TODO"""
     row = tl.program_id(0)
     offs = tl.arange(0, BLOCK_SIZE)
     mask = offs < n_cols
