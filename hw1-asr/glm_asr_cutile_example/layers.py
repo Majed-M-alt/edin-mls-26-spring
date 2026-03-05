@@ -38,7 +38,7 @@ def rmsnorm_kernel(
     eps: ct.Constant[float],
     hidden_size: ct.Constant[int]
 ):
-    """RMSNorm: x / RMS(x) * weight"""
+    """RMSNorm: x / RMS(x) * weight TODO"""
     pid = ct.bid(0)
 
     x_tile = ct.load(x, index=(pid, 0), shape=(1, hidden_size))
@@ -62,7 +62,7 @@ def layernorm_kernel(
     eps: ct.Constant[float],
     hidden_size: ct.Constant[int]
 ):
-    """LayerNorm: (x - mean) / sqrt(var + eps) * weight + bias"""
+    """LayerNorm: (x - mean) / sqrt(var + eps) * weight + bias TODO"""
     pid = ct.bid(0)
 
     x_tile = ct.load(x, index=(pid, 0), shape=(1, hidden_size))
@@ -82,7 +82,7 @@ def layernorm_kernel(
 
 @ct.kernel
 def gelu_kernel(x, output, tile_size: ct.Constant[int]):
-    """GELU using tanh approximation."""
+    """GELU using tanh approximation. TODO"""
     pid = ct.bid(0)
     x_tile = ct.load(x, index=(pid,), shape=(tile_size,))
 
@@ -96,7 +96,7 @@ def gelu_kernel(x, output, tile_size: ct.Constant[int]):
 
 @ct.kernel
 def silu_kernel(x, output, tile_size: ct.Constant[int]):
-    """SiLU/Swish: x * sigmoid(x)"""
+    """SiLU/Swish: x * sigmoid(x) TODO"""
     pid = ct.bid(0)
     x_tile = ct.load(x, index=(pid,), shape=(tile_size,))
 
@@ -118,7 +118,7 @@ def linear_kernel_tf32(
     """
     TF32 tensor core matmul: output = x @ weight_t
     Uses TF32 format for tensor core acceleration on Blackwell/Ampere+.
-    64x64 tiles with 32-wide K dimension for optimal performance.
+    64x64 tiles with 32-wide K dimension for optimal performance. TODO
     """
     TILE_M, TILE_N, TILE_K = 64, 64, 32
     pid_m = ct.bid(0)
@@ -266,7 +266,7 @@ def softmax_kernel(
     output,         # Output: (batch, seq_len)
     seq_len: ct.Constant[int]
 ):
-    """Numerically stable softmax over last dimension."""
+    """Numerically stable softmax over last dimension.TODO"""
     pid = ct.bid(0)
 
     x_tile = ct.load(x, index=(pid, 0), shape=(1, seq_len))
