@@ -40,15 +40,6 @@ def next_power_of_two(x: int) -> int:
 # Triton Kernels
 # ============================================================================
 
-@triton.autotune(
-    configs=[
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=4),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=4),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=8),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8),
-    ],
-    key=['hidden_size'], 
-)
 @triton.jit
 def rmsnorm_kernel(
     x_ptr,
@@ -91,15 +82,7 @@ def rmsnorm_kernel(
     tl.store(y_ptr + pid * stride_y + offs, y, mask=mask)
 
 
-@triton.autotune(
-    configs=[
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=4),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=4),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=8),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8),
-    ],
-    key=['hidden_size'], 
-)
+
 @triton.jit
 def layernorm_kernel(
     x_ptr,
@@ -255,6 +238,24 @@ def linear_kernel_tf32(
     offs_k = tl.arange(0, BLOCK_K)
 
     acc = tl.zeros((BLOCK_M, BLOCK_N), dtype=tl.float32)
+    for k in range(0, K, BLOCK_K):
+        a = tl.load(
+            a_ptr + offs_m[:, None] * stride_am + (k + offs_k[None, :]) * stride_ak,
+            mask=(offs_m[:, None] < M) & (k + offs_k[None, :] < K),
+            other=0.0,
+        )
+        b = tl.load(
+            b_ptr + (k + offs_k[:, None]) * stride_bk + offs_n[None, :] * stride_bn,
+            mask=(k + offs_k[:, None] < K) & (offs_n[None, :] < N),
+            other=0.0,
+        )
+        acc += tl.dot(a, b)
+
+    tl.store(
+        c_ptr + offs_m[:, None] * stride_cm + offs_n[None, :] * stride_cn,
+        acc,
+        mask=(offs_m[:, None] < M) & (offs_n[None, :] < N),
+    )
 
 
 @triton.jit
@@ -597,7 +598,8 @@ class RMSNorm:
             if self.weight.device != x.device:
                 self.weight = self.weight.to(x.device)
 
-            
+            block_size = next_power_of_two(self.hidden_size)
+
             rmsnorm_kernel[(batch_size,)](
                 x_flat,
                 self.weight,
@@ -606,6 +608,7 @@ class RMSNorm:
                 output.stride(0),
                 self.hidden_size,
                 self.eps,
+                BLOCK_SIZE=block_size,
             )
             return output.reshape(original_shape)
 
@@ -641,6 +644,7 @@ class LayerNorm:
             if self.bias.device != x.device:
                 self.bias = self.bias.to(x.device)
 
+            block_size = next_power_of_two(self.hidden_size)
 
             layernorm_kernel[(batch_size,)](
                 x_flat,
@@ -651,6 +655,7 @@ class LayerNorm:
                 output.stride(0),
                 self.hidden_size,
                 self.eps,
+                BLOCK_SIZE=block_size,
             )
             return output.reshape(original_shape)
 
@@ -714,7 +719,7 @@ class Linear:
     TILE_N = 64
     TILE_K = 32
 
-    BACKEND = "torch"
+    BACKEND = "auto"
 
     def __init__(self, in_features: int, out_features: int, bias: bool = True):
         self.in_features = in_features
@@ -954,7 +959,9 @@ class MLP:
             self._up_weight_t = self.up_proj.weight.t().contiguous()
 
     def __call__(self, x: torch.Tensor) -> torch.Tensor:
-        if self.use_gating and MLP.FUSED and x.is_cuda:
+        M = int(np.prod(x.shape[:-1])) # Calculate M
+        # Only use Triton if M is large enough to be worth it
+        if self.use_gating and MLP.FUSED and x.is_cuda and M >= self.TILE_M:
             return self._forward_fused(x)
         return self._forward_standard(x)
 
@@ -1070,7 +1077,9 @@ class EncoderMLP:
             self._fc1_weight_t = self.fc1.weight.t().contiguous()
 
     def __call__(self, x: torch.Tensor) -> torch.Tensor:
-        if EncoderMLP.FUSED and self.activation == "gelu" and x.is_cuda:
+        M = int(np.prod(x.shape[:-1])) # Calculate M
+        # Only use Triton if M is large enough to be worth it
+        if EncoderMLP.FUSED and self.activation == "gelu" and x.is_cuda and M >= self.TILE_M:
             return self._forward_fused(x)
         return self._forward_standard(x)
 

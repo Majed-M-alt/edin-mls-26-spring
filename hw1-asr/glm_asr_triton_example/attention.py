@@ -43,7 +43,7 @@ def attention_scores_kernel(
 ):
     """
     Compute scaled attention scores for a single query position.
-    Grid: (batch_heads, seq_q)
+    Grid: (batch_heads, seq_q) TODO
     """
     pid_bh = tl.program_id(0)
     pid_q = tl.program_id(1)
@@ -79,7 +79,7 @@ def attention_scores_kernel(
 def softmax_inplace_kernel(scores_ptr, stride_s, seq_k, BLOCK_SIZE: tl.constexpr):
     """
     Apply softmax along the last dimension (seq_k).
-    Grid: (batch_heads * seq_q,)
+    Grid: (batch_heads * seq_q,) TODO
     """
     row = tl.program_id(0)
     offs = tl.arange(0, BLOCK_SIZE)
@@ -115,7 +115,7 @@ def attention_output_kernel(
 ):
     """
     Compute attention output: attn_weights @ V
-    Grid: (batch_heads, seq_q)
+    Grid: (batch_heads, seq_q) TODO
     """
     pid_bh = tl.program_id(0)
     pid_q = tl.program_id(1)

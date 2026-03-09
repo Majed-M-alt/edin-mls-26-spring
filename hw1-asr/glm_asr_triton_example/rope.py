@@ -37,7 +37,7 @@ def compute_freqs_kernel(
     stride_sin1,
     BLOCK: tl.constexpr,
 ):
-    """Compute cos and sin for rotary embeddings."""
+    """Compute cos and sin for rotary embeddings.TODO"""
     pid = tl.program_id(0)
     offs = tl.arange(0, BLOCK)
     mask = offs < half_dim
