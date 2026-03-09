@@ -175,8 +175,8 @@ def scaled_dot_product_attention(
     if scale is None:
         scale = 1.0 / np.sqrt(head_dim)
 
-    # Fallback to PyTorch only if not CUDA or if a complex 4D attention_mask is passed
-    if not q.is_cuda or attention_mask is not None:
+    # Fallback to PyTorch only if not CUDA, complex mask, OR we are decoding (small seq_q)
+    if not q.is_cuda or attention_mask is not None or seq_q < 32:
         scores = torch.einsum("bnqd,bnkd->bnqk", q, k) * scale
         if is_causal:
             mask = torch.triu(torch.ones((seq_q, seq_k), dtype=torch.float32, device=q.device), diagonal=1) * -1e9
@@ -188,7 +188,7 @@ def scaled_dot_product_attention(
         attn_weights = torch.exp(scores)
         attn_weights = attn_weights / torch.sum(attn_weights, dim=-1, keepdim=True)
         return torch.einsum("bnqk,bnkd->bnqd", attn_weights, v).to(q.dtype)
-
+   
     # Ensure tensors are contiguous for Triton
     q_flat = q.reshape(batch * num_heads, seq_q, head_dim).contiguous().to(torch.float32)
     k_flat = k.reshape(batch * num_heads, seq_k, head_dim).contiguous().to(torch.float32)
